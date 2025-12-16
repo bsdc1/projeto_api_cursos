@@ -1,0 +1,537 @@
+{
+	"info": {
+		"_postman_id": "api-cursos-bruno",
+		"name": "API REST - Plataforma de Cursos",
+		"description": "Collection completa da API REST de Cursos\n\n**Variáveis de Ambiente:**\n- `base_url`: URL base da API (ex: http://localhost:3000)\n- `token`: Token JWT (preenchido automaticamente após login)\n\n**Como usar:**\n1. Importe esta collection no Postman\n2. Configure a variável `base_url` na collection\n3. Faça login/registro para obter o token\n4. O token será salvo automaticamente nas variáveis\n5. Use os outros endpoints normalmente",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Autenticação",
+			"item": [
+				{
+					"name": "Register - Criar Usuário",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Salva token automaticamente após registro",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.token) {",
+									"        pm.collectionVariables.set('token', response.data.token);",
+									"        pm.collectionVariables.set('user_id', response.data.user.id);",
+									"        pm.collectionVariables.set('user_role', response.data.user.role);",
+									"        console.log('Token salvo automaticamente!');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"João Silva\",\n    \"email\": \"joao@example.com\",\n    \"password\": \"senha123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						},
+						"description": "Registra um novo usuário (role padrão: student)\n\n**Body:**\n- name: Nome do usuário (obrigatório)\n- email: E-mail do usuário (obrigatório, único)\n- password: Senha (mínimo 6 caracteres)\n\n**Response:**\n- Retorna token JWT e dados do usuário criado"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Salva token automaticamente após login",
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data.token) {",
+									"        pm.collectionVariables.set('token', response.data.token);",
+									"        pm.collectionVariables.set('user_id', response.data.user.id);",
+									"        pm.collectionVariables.set('user_role', response.data.user.role);",
+									"        console.log('Token salvo automaticamente!');",
+									"        console.log('Role:', response.data.user.role);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"joao@example.com\",\n    \"password\": \"senha123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Realiza login e retorna token JWT\n\n**Body:**\n- email: E-mail do usuário\n- password: Senha do usuário\n\n**Response:**\n- Retorna token JWT e dados do usuário\n\n**Nota:** O token é salvo automaticamente nas variáveis da collection"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Me - Dados do Usuário Logado",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						},
+						"description": "Retorna dados do usuário autenticado\n\n**Headers:**\n- Authorization: Bearer {token}\n\n**Response:**\n- Dados do usuário logado (id, name, email, role, createdAt)"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de autenticação e gerenciamento de usuário"
+		},
+		{
+			"name": "2. Usuários (Admin)",
+			"item": [
+				{
+					"name": "Get Users - Listar Usuários",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users?page=1&limit=10&role=student",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Número da página"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Itens por página"
+								},
+								{
+									"key": "role",
+									"value": "student",
+									"description": "Filtrar por role (admin ou student)",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Lista todos os usuários (apenas admin)\n\n**Headers:**\n- Authorization: Bearer {token} (admin)\n\n**Query Parameters:**\n- page: Número da página (padrão: 1)\n- limit: Itens por página (padrão: 10)\n- role: Filtrar por role (opcional: admin ou student)\n\n**Response:**\n- Lista de usuários com paginação"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de gerenciamento de usuários (apenas admin)"
+		},
+		{
+			"name": "3. Cursos",
+			"item": [
+				{
+					"name": "Get Courses - Listar Cursos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/courses?page=1&limit=10&category=nodejs&status=published&sort=-createdAt",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"courses"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Número da página"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Itens por página"
+								},
+								{
+									"key": "category",
+									"value": "nodejs",
+									"description": "Filtrar por categoria",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "published",
+									"description": "Filtrar por status (draft ou published). Admin pode ver todos.",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "-createdAt",
+									"description": "Ordenação (ex: createdAt, -createdAt, title, -title)",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Lista cursos com paginação e filtros (público)\n\n**Query Parameters:**\n- page: Número da página (padrão: 1)\n- limit: Itens por página (padrão: 10)\n- category: Filtrar por categoria\n- status: Filtrar por status (draft ou published)\n  - Usuários comuns só veem 'published'\n  - Admin pode ver todos\n- sort: Ordenação (ex: createdAt, -createdAt)\n\n**Response:**\n- Lista de cursos com paginação"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Course by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/courses/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"courses",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "COURSE_ID_AQUI",
+									"description": "ID do curso"
+								}
+							]
+						},
+						"description": "Busca curso por ID (público)\n\n**Path Parameters:**\n- id: ID do curso\n\n**Response:**\n- Detalhes do curso\n\n**Nota:** Cursos em draft só aparecem para admin"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Course - Criar Curso",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Node.js Avançado\",\n    \"description\": \"Curso completo de Node.js com Express e MongoDB\",\n    \"category\": \"nodejs\",\n    \"status\": \"published\",\n    \"instructor\": null\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/courses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"courses"
+							]
+						},
+						"description": "Cria um novo curso (apenas admin)\n\n**Headers:**\n- Authorization: Bearer {token} (admin)\n\n**Body:**\n- title: Título do curso (obrigatório)\n- description: Descrição do curso (obrigatório)\n- category: Categoria do curso (obrigatório)\n- status: Status do curso (draft ou published, padrão: draft)\n- instructor: ID do instrutor (opcional, ObjectId do User)\n\n**Response:**\n- Curso criado com sucesso"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Course - Atualizar Curso",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Node.js Avançado - Atualizado\",\n    \"status\": \"published\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/courses/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"courses",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "COURSE_ID_AQUI",
+									"description": "ID do curso"
+								}
+							]
+						},
+						"description": "Atualiza um curso (apenas admin)\n\n**Headers:**\n- Authorization: Bearer {token} (admin)\n\n**Path Parameters:**\n- id: ID do curso\n\n**Body:**\n- Campos opcionais (atualização parcial):\n  - title: Título\n  - description: Descrição\n  - category: Categoria\n  - status: Status (draft ou published)\n  - instructor: ID do instrutor\n\n**Response:**\n- Curso atualizado"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Course - Deletar Curso",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/courses/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"courses",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "COURSE_ID_AQUI",
+									"description": "ID do curso"
+								}
+							]
+						},
+						"description": "Deleta um curso (apenas admin)\n\n**Headers:**\n- Authorization: Bearer {token} (admin)\n\n**Path Parameters:**\n- id: ID do curso\n\n**Response:**\n- Confirmação de exclusão"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de gerenciamento de cursos"
+		},
+		{
+			"name": "4. Matrículas",
+			"item": [
+				{
+					"name": "Enroll in Course - Matricular em Curso",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/courses/:courseId/enroll",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"courses",
+								":courseId",
+								"enroll"
+							],
+							"variable": [
+								{
+									"key": "courseId",
+									"value": "COURSE_ID_AQUI",
+									"description": "ID do curso"
+								}
+							]
+						},
+						"description": "Matricula o usuário autenticado em um curso (apenas student)\n\n**Headers:**\n- Authorization: Bearer {token} (student)\n\n**Path Parameters:**\n- courseId: ID do curso\n\n**Response:**\n- Matrícula criada com sucesso\n\n**Erros:**\n- 400: Já está matriculado neste curso\n- 404: Curso não encontrado"
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Enrollments - Minhas Matrículas",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/me/enrollments?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"me",
+								"enrollments"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Número da página"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Itens por página"
+								}
+							]
+						},
+						"description": "Lista matrículas do usuário autenticado\n\n**Headers:**\n- Authorization: Bearer {token}\n\n**Query Parameters:**\n- page: Número da página (padrão: 1)\n- limit: Itens por página (padrão: 10)\n\n**Response:**\n- Lista de matrículas com dados do curso"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Enrollment - Cancelar Matrícula",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/enrollments/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"enrollments",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "ENROLLMENT_ID_AQUI",
+									"description": "ID da matrícula"
+								}
+							]
+						},
+						"description": "Cancela uma matrícula\n\n**Headers:**\n- Authorization: Bearer {token}\n\n**Path Parameters:**\n- id: ID da matrícula\n\n**Permissões:**\n- Aluno pode cancelar apenas suas próprias matrículas\n- Admin pode cancelar qualquer matrícula\n\n**Response:**\n- Confirmação de cancelamento"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de matrículas"
+		},
+		{
+			"name": "5. Testes",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								""
+							]
+						},
+						"description": "Verifica se a API está funcionando\n\n**Response:**\n- Mensagem de boas-vindas e versão da API"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de teste e verificação"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_role",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
+
