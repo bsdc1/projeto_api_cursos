@@ -1,0 +1,15 @@
+# Dockerfile para MongoDB
+# Nota: Este Dockerfile é baseado na imagem oficial do MongoDB
+# Para uso mais simples, recomenda-se usar docker-compose.yml
+
+FROM mongo:7.0
+
+# Definir diretório de trabalho
+WORKDIR /data
+
+# Expor porta padrão do MongoDB
+EXPOSE 27017
+
+# Comando padrão do MongoDB
+CMD ["mongod"]
+
