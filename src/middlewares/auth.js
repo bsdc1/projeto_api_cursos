@@ -17,7 +17,7 @@ const authenticate = async (req, res, next) => {
     const token = authHeader.substring(7); // Remove "Bearer "
 
     // Verifica e decodifica o token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'seu_secret_aqui');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'sua_secret_aqui');
     
     // Busca o usuário no banco
     const user = await User.findById(decoded.userId);

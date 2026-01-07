@@ -107,7 +107,7 @@ exports.createCourse = async (req, res, next) => {
       });
     }
 
-    const { title, description, category, status, instructor } = req.body;
+    const { title, description, category, status, instructor, price } = req.body;
 
     const course = await Course.create({
       title,
@@ -115,6 +115,7 @@ exports.createCourse = async (req, res, next) => {
       category,
       status: status || 'draft',
       instructor: instructor || null,
+      price,
     });
 
     await course.populate('instructor', 'name email');
@@ -141,7 +142,7 @@ exports.updateCourse = async (req, res, next) => {
       });
     }
 
-    const { title, description, category, status, instructor } = req.body;
+    const { title, description, category, status, instructor, price } = req.body;
 
     const course = await Course.findById(req.params.id);
 
@@ -158,6 +159,7 @@ exports.updateCourse = async (req, res, next) => {
     if (category !== undefined) course.category = category;
     if (status !== undefined) course.status = status;
     if (instructor !== undefined) course.instructor = instructor;
+    if (price !== undefined) course.price = price;
 
     await course.save();
     await course.populate('instructor', 'name email');

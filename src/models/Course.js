@@ -26,6 +26,12 @@ const courseSchema = new mongoose.Schema({
     ref: 'User',
     default: null,
   },
+  price: {
+    type: Number,
+    required: [true, 'Preço é obrigatório'],
+    min: [0, 'Preço não pode ser negativo'],
+    // Preço em centavos (ex: 9990 = R$ 99,90)
+  },
 }, {
   timestamps: true,
 });

@@ -10,6 +10,7 @@ const courseValidation = [
   body('description').trim().notEmpty().withMessage('Descrição é obrigatória'),
   body('category').trim().notEmpty().withMessage('Categoria é obrigatória'),
   body('status').optional().isIn(['draft', 'published']).withMessage('Status inválido'),
+  body('price').isInt({ min: 0 }).withMessage('Preço deve ser um número inteiro positivo (em centavos)'),
 ];
 
 // GET /courses (público)

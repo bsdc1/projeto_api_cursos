@@ -17,8 +17,9 @@ API REST desenvolvida em Node.js + Express + MongoDB para uma plataforma de curs
 
 - Node.js (v14 ou superior)
 - MongoDB (local ou MongoDB Atlas)
+- Docker e Docker Compose (opcional, para usar MongoDB via Docker)
 
-### Instalação
+### Opção 1: Usando Docker para MongoDB (Recomendado)
 
 1. Clone o repositório e instale as dependências:
 
@@ -26,13 +27,73 @@ API REST desenvolvida em Node.js + Express + MongoDB para uma plataforma de curs
 npm install
 ```
 
-2. Configure as variáveis de ambiente:
+2. Inicie o MongoDB usando Docker Compose:
 
 ```bash
-cp .env.example .env
+docker compose up -d
 ```
 
-Edite o arquivo `.env` com suas configurações:
+Isso irá:
+- Criar um container MongoDB na porta 27017
+- Criar um usuário admin (usuário: `admin`, senha: `admin123`)
+- Criar o banco de dados `cursos_db`
+- Persistir os dados em volumes Docker
+
+3. Configure as variáveis de ambiente:
+
+Crie um arquivo `.env` na raiz do projeto:
+
+```env
+PORT=3000
+MONGODB_URI=mongodb://admin:admin123@localhost:27017/cursos_db?authSource=admin
+JWT_SECRET=seu_secret_jwt_aqui
+JWT_EXPIRE=7d
+```
+
+**Nota:** Se preferir usar MongoDB sem autenticação, você pode usar:
+```env
+MONGODB_URI=mongodb://localhost:27017/cursos_db
+```
+
+E remover as variáveis de ambiente de autenticação do `docker-compose.yml`.
+
+4. Inicie o servidor:
+
+```bash
+# Modo desenvolvimento (com nodemon)
+npm run dev
+
+# Modo produção
+npm start
+```
+
+O servidor estará rodando em `http://localhost:3000`
+
+**Comandos úteis do Docker:**
+```bash
+# Parar o MongoDB
+docker compose down
+
+# Parar e remover volumes (apaga os dados)
+docker compose down -v
+
+# Ver logs do MongoDB
+docker compose logs -f mongodb
+```
+
+### Opção 2: MongoDB Local
+
+1. Clone o repositório e instale as dependências:
+
+```bash
+npm install
+```
+
+2. Instale e configure o MongoDB localmente
+
+3. Configure as variáveis de ambiente:
+
+Crie um arquivo `.env` na raiz do projeto:
 
 ```env
 PORT=3000
@@ -41,7 +102,7 @@ JWT_SECRET=seu_secret_jwt_aqui
 JWT_EXPIRE=7d
 ```
 
-3. Inicie o servidor:
+4. Inicie o servidor:
 
 ```bash
 # Modo desenvolvimento (com nodemon)

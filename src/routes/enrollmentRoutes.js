@@ -9,6 +9,9 @@ router.post('/courses/:courseId/enroll', authenticate, authorize('student'), enr
 // GET /me/enrollments (autenticado)
 router.get('/me/enrollments', authenticate, enrollmentController.getMyEnrollments);
 
+// PATCH /enrollments/:id/confirm-payment (autenticado - próprio aluno ou admin)
+router.patch('/enrollments/:id/confirm-payment', authenticate, enrollmentController.confirmPayment);
+
 // DELETE /enrollments/:id (autenticado - próprio aluno ou admin)
 router.delete('/enrollments/:id', authenticate, enrollmentController.deleteEnrollment);
 
